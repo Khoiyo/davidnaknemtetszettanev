@@ -9,7 +9,7 @@
 </head>
 <body>
 <header>
-    <img src="images/<?= htmlspecialchars($fejlec['kepforras']) ?>" alt="<?= htmlspecialchars($fejlec['kepalt']) ?>">
+    <img src="/images/<?= htmlspecialchars($fejlec['kepforras']) ?>" alt="<?= htmlspecialchars($fejlec['kepalt']) ?>">
     <h1><?= htmlspecialchars($fejlec['cim']) ?></h1>
     <p><?= htmlspecialchars($fejlec['motto']) ?></p>
     <?php if (isset($_SESSION['login'])): ?>

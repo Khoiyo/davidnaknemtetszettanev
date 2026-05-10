@@ -1,7 +1,7 @@
 <?php
 $ablakcim = ['cim' => 'Web Progzamozás Gyakorlat Beadandó'];
 $fejlec = [
-    'kepforras' => 'logo.png',
+    'kepforras' => 'logo2.png',
     'kepalt' => 'Honlap logó',
     'cim' => 'Honlap',
     'motto' => 'Web Progzamozás Gyakorlat Beadandó'
