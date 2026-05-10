@@ -1,31 +1,17 @@
 <?php
-if(isset($_POST['felhasznalo']) && isset($_POST['jelszo'])) {
-    try {
-        // Kapcsolódás
-        $dbh = new PDO('mysql:host=localhost;dbname=nagylaszlo;charset=utf8',
-            'nagylaszlo',
-            'Admin12345',
-	 	[
-                	PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                	PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-            	]
-	);
-        $dbh->query('SET NAMES utf8 COLLATE utf8_hungarian_ci');
-        
-        // Felhsználó keresése
-        $sqlSelect = "select id, csaladi_nev, uto_nev from felhasznalok where bejelentkezes = :bejelentkezes and jelszo = sha1(:jelszo)";
-        $sth = $dbh->prepare($sqlSelect);
-        $sth->execute(array(':bejelentkezes' => $_POST['felhasznalo'], ':jelszo' => $_POST['jelszo']));
-        $row = $sth->fetch(PDO::FETCH_ASSOC);
-        if($row) {
-            $_SESSION['csn'] = $row['csaladi_nev']; $_SESSION['un'] = $row['uto_nev']; $_SESSION['login'] = $_POST['felhasznalo'];
-        }
+$errormessage = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['felhasznalo'], $_POST['jelszo'])) {
+    $sql = "SELECT id, csaladi_nev, uto_nev, bejelentkezes FROM felhasznalok WHERE bejelentkezes = :login AND jelszo = SHA1(:pass)";
+    $sth = $conn->prepare($sql);
+    $sth->execute([':login' => $_POST['felhasznalo'], ':pass' => $_POST['jelszo']]);
+    $row = $sth->fetch();
+    if ($row) {
+        $_SESSION['userid'] = $row['id'];
+        $_SESSION['csn'] = $row['csaladi_nev'];
+        $_SESSION['un'] = $row['uto_nev'];
+        $_SESSION['login'] = $row['bejelentkezes'];
+    } else {
+        $errormessage = 'Hibás felhasználónév vagy jelszó.';
     }
-    catch (PDOException $e) {
-        $errormessage = "Hiba: ".$e->getMessage();
-    }      
-}
-else {
-    header("Location: .");
-}
+} else { header('Location: belepes'); exit; }
 ?>
