@@ -1,49 +1,17 @@
 <?php
-if(isset($_POST['felhasznalo']) && isset($_POST['jelszo']) && isset($_POST['vezeteknev']) && isset($_POST['utonev'])) {
-    try {
-        // Kapcsolódás
-        $dbh = new PDO('mysql:host=localhost;dbname=nagylaszlo;charset=utf8',
-            'nagylaszlo',
-            'Admin12345',
-	 	[
-                	PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                	PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-            	]
-	);
-        $dbh->query('SET NAMES utf8 COLLATE utf8_hungarian_ci');
-        
-        // Létezik már a felhasználói név?
-        $sqlSelect = "select id from felhasznalok where bejelentkezes = :bejelentkezes";
-        $sth = $dbh->prepare($sqlSelect);
-        $sth->execute(array(':bejelentkezes' => $_POST['felhasznalo']));
-        if($row = $sth->fetch(PDO::FETCH_ASSOC)) {
-            $uzenet = "A felhasználói név már foglalt!";
-            $ujra = "true";
-        }
+$uzenet=''; $ujra=true;
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $required = ['vezeteknev','utonev','felhasznalo','jelszo'];
+    foreach ($required as $r) { if (empty(trim($_POST[$r] ?? ''))) { $uzenet='Minden mező kitöltése kötelező.'; break; } }
+    if (!$uzenet) {
+        $sth = $conn->prepare('SELECT id FROM felhasznalok WHERE bejelentkezes = :login');
+        $sth->execute([':login'=>$_POST['felhasznalo']]);
+        if ($sth->fetch()) { $uzenet='A felhasználói név már foglalt!'; }
         else {
-            // Ha nem létezik, akkor regisztráljuk
-            $sqlInsert = "insert into felhasznalok(id, csaladi_nev, uto_nev, bejelentkezes, jelszo)
-                          values(0, :csaladinev, :utonev, :bejelentkezes, :jelszo)";
-            $stmt = $dbh->prepare($sqlInsert); 
-            $stmt->execute(array(':csaladinev' => $_POST['vezeteknev'], ':utonev' => $_POST['utonev'],
-                                 ':bejelentkezes' => $_POST['felhasznalo'], ':jelszo' => sha1($_POST['jelszo']))); 
-            if($count = $stmt->rowCount()) {
-                $newid = $dbh->lastInsertId();
-                $uzenet = "A regisztrációja sikeres.<br>Azonosítója: {$newid}";                     
-                $ujra = false;
-            }
-            else {
-                $uzenet = "A regisztráció nem sikerült.";
-                $ujra = true;
-            }
+            $stmt = $conn->prepare('INSERT INTO felhasznalok(csaladi_nev, uto_nev, bejelentkezes, jelszo) VALUES(:csn,:un,:login,SHA1(:pass))');
+            $stmt->execute([':csn'=>$_POST['vezeteknev'], ':un'=>$_POST['utonev'], ':login'=>$_POST['felhasznalo'], ':pass'=>$_POST['jelszo']]);
+            $uzenet='A regisztráció sikeres. Azonosítója: '.$conn->lastInsertId(); $ujra=false;
         }
     }
-    catch (PDOException $e) {
-        $uzenet = "Hiba: ".$e->getMessage();
-        $ujra = true;
-    }      
-}
-else {
-    header("Location: .");
-}
+} else { header('Location: belepes'); exit; }
 ?>
