@@ -1,15 +1,1 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Regisztráció</title>
-        <meta charset="utf-8">
-    </head>
-    <body>
-        <?php if(isset($uzenet)) { ?>
-            <h1><?= $uzenet ?></h1>
-            <?php if($ujra) { ?>
-                <a href="belepes">Próbálja újra!</a>
-            <?php } ?>
-        <?php } ?>
-    </body>  
-</html>
+<h2>Regisztráció</h2><p class="message <?= empty($ujra) ? 'ok' : 'error' ?>"><?= nl2br(htmlspecialchars($uzenet ?? '')) ?></p><?php if (!empty($ujra)): ?><p><a href="belepes">Próbálja újra!</a></p><?php else: ?><p><a href="belepes">Belépés</a></p><?php endif; ?>
