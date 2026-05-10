@@ -1,8 +1,8 @@
 <?php
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'gyakorlat7');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+define('DB_NAME', 'nagylaszlo');
+define('DB_USER', 'nagylaszlo');
+define('DB_PASS', 'Admin12345');
 
 try {
     $conn = new PDO(
